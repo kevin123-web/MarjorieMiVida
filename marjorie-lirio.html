@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Para Marjorie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2b1740;
+    --iris-deep:#4b2170;
+    --iris-mid:#7a3fa0;
+    --iris-light:#b28fce;
+    --paper:#f7f2fa;
+    --paper-2:#efe4f4;
+    --gold:#b8925a;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:radial-gradient(ellipse at 50% 0%, var(--paper-2), var(--paper) 60%);
+    color:var(--ink);
+    font-family:'Jost',sans-serif;
+    overflow-x:hidden;
+    min-height:100%;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1b1224; --paper-2:#241730; --ink:#ecdff5;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1b1224; --paper-2:#241730; --ink:#ecdff5;
+  }
+
+  .stage{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:6vh 6vw 8vh;
+    text-align:center;
+  }
+
+  .eyebrow{
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;
+    font-size:clamp(1rem,2vw,1.2rem);
+    color:var(--iris-mid);
+    letter-spacing:.04em;
+    margin:0 0 .4rem;
+    opacity:0;
+    animation:rise .9s ease-out .2s forwards;
+  }
+
+  h1{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:600;
+    font-size:clamp(2.6rem,7vw,4.6rem);
+    line-height:1.05;
+    margin:0 0 1.4rem;
+    color:var(--iris-deep);
+    opacity:0;
+    animation:rise .9s ease-out .4s forwards;
+  }
+
+  .flower-wrap{
+    position:relative;
+    width:min(78vw,420px);
+    aspect-ratio:3/4;
+    margin:0 auto 1.6rem;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    opacity:0;
+    animation:rise 1.1s ease-out .55s forwards;
+  }
+  .flower-wrap svg{width:100%;height:100%;display:block;overflow:visible;}
+  .flower-wrap .hint{
+    font-size:.8rem;
+    letter-spacing:.03em;
+    color:var(--iris-mid);
+    margin-top:.6rem;
+    opacity:.75;
+  }
+
+  .petal{ transform-origin:160px 258px; transition:transform 1.1s cubic-bezier(.2,.8,.2,1); }
+  .bloom .petal-back{ transform:rotate(var(--rb,0deg)) translateY(-4px); }
+  .bloom .petal-front{ transform:rotate(var(--rf,0deg)) translateY(-6px) scale(1.03); }
+  .bloom .fall{ transform:rotate(var(--rd,0deg)) translateY(6px); }
+
+  .glow{
+    filter:drop-shadow(0 18px 34px rgba(75,33,112,.28));
+    transition:filter 1.1s ease;
+  }
+  .bloom .glow{ filter:drop-shadow(0 24px 46px rgba(75,33,112,.4)); }
+
+  .sparkle{ opacity:0; transform-origin:center; }
+  .bloom .sparkle{ animation:twinkle 1.8s ease-in-out .3s infinite; }
+  .bloom .sparkle:nth-child(2){ animation-delay:.6s; }
+  .bloom .sparkle:nth-child(3){ animation-delay:1s; }
+
+  .dedication{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(1.05rem,2.4vw,1.35rem);
+    line-height:1.55;
+    color:var(--ink);
+    max-width:46ch;
+    margin:.4rem auto 0;
+    padding:1.4rem 1.6rem;
+    background:rgba(255,255,255,.35);
+    border:1px solid rgba(122,63,160,.25);
+    border-radius:2px;
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    transition:max-height .9s ease, opacity .7s ease, padding .9s ease, margin .9s ease;
+  }
+  .dedication.open{
+    max-height:400px;
+    opacity:1;
+    margin-top:1.4rem;
+  }
+  .dedication p{margin:0 0 .8rem;}
+  .dedication p:last-child{margin-bottom:0;}
+  .signature{
+    display:block;
+    margin-top:1rem;
+    font-style:italic;
+    color:var(--iris-mid);
+  }
+
+  .petals-fall{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:2;
+  }
+  .fp{
+    position:absolute;
+    top:-5%;
+    width:14px;
+    height:18px;
+    background:radial-gradient(circle at 30% 30%, var(--iris-light), var(--iris-mid));
+    border-radius:60% 40% 60% 40%;
+    opacity:.0;
+    animation:fallpetal linear forwards;
+  }
+
+  @keyframes rise{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes twinkle{ 0%,100%{opacity:0; transform:scale(.6);} 50%{opacity:.9; transform:scale(1);} }
+  @keyframes fallpetal{
+    0%{opacity:0; transform:translateY(0) rotate(0deg);}
+    8%{opacity:.85;}
+    100%{opacity:0; transform:translateY(108vh) rotate(340deg);}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  }
+
+  footer{
+    position:relative;
+    z-index:1;
+    text-align:center;
+    font-size:.75rem;
+    letter-spacing:.03em;
+    color:var(--iris-mid);
+    opacity:.6;
+    padding-bottom:2rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="petals-fall" id="petalsFall" aria-hidden="true"></div>
+
+<div class="stage">
+  <p class="eyebrow">una carta pequeña, para una persona muy grande</p>
+  <h1>Para Marjorie</h1>
+
+  <div class="flower-wrap" id="flowerWrap" role="button" tabindex="0" aria-label="Toca el lirio para abrir la dedicatoria">
+    <svg viewBox="0 0 320 440" class="glow">
+      <defs>
+        <linearGradient id="fallDeep" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stop-color="#8a52ad"/>
+          <stop offset="38%" stop-color="#5c2c86"/>
+          <stop offset="75%" stop-color="#3c1a5e"/>
+          <stop offset="100%" stop-color="#280f42"/>
+        </linearGradient>
+        <linearGradient id="fallMid" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stop-color="#9d68bc"/>
+          <stop offset="40%" stop-color="#6d3798"/>
+          <stop offset="100%" stop-color="#3c1a5e"/>
+        </linearGradient>
+        <linearGradient id="standardGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stop-color="#d9bce9"/>
+          <stop offset="35%" stop-color="#b47fd0"/>
+          <stop offset="75%" stop-color="#8347ab"/>
+          <stop offset="100%" stop-color="#602f80"/>
+        </linearGradient>
+        <linearGradient id="standardFront" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stop-color="#efe0f6"/>
+          <stop offset="30%" stop-color="#cf9fe0"/>
+          <stop offset="70%" stop-color="#9c5cc0"/>
+          <stop offset="100%" stop-color="#6f3894"/>
+        </linearGradient>
+        <linearGradient id="stemGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#4c7a45"/>
+          <stop offset="100%" stop-color="#274a26"/>
+        </linearGradient>
+        <linearGradient id="leafGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4d7c46"/>
+          <stop offset="100%" stop-color="#254a26"/>
+        </linearGradient>
+        <radialGradient id="beardGlow" cx="50%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#fff6d8"/>
+          <stop offset="45%" stop-color="#f0d27e"/>
+          <stop offset="100%" stop-color="#b98a3a"/>
+        </radialGradient>
+        <filter id="petalTexture" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="2" seed="7" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="4"/>
+        </filter>
+        <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="1.1"/>
+        </filter>
+      </defs>
+
+      <!-- tallo y hojas -->
+      <path d="M160 360 C156 320 164 276 160 220" stroke="url(#stemGrad)" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M160 330 C112 322 78 292 62 248 C108 250 146 278 160 330 Z" fill="url(#leafGrad)"/>
+      <path d="M160 300 C112 288 84 258 74 220 C114 226 146 256 160 300 Z" fill="url(#leafGrad)" opacity=".85"/>
+      <path d="M160 344 C206 330 234 300 246 258 C204 264 172 294 160 344 Z" fill="url(#leafGrad)"/>
+
+      <!-- FALLS: los 3 petalos caidos, con forma orgánica y venas -->
+      <g class="petal fall" style="--rd:-8deg" filter="url(#petalTexture)">
+        <path d="M162 258 C126 250 92 258 62 236 C40 220 30 192 34 160 C58 168 78 186 92 210 C108 236 132 250 162 258 Z" fill="url(#fallDeep)"/>
+        <path d="M60 232 C64 210 72 190 88 174" stroke="#200c38" stroke-width="1" fill="none" opacity=".45"/>
+        <path d="M70 224 C74 204 82 186 96 170" stroke="#200c38" stroke-width="1" fill="none" opacity=".35"/>
+        <ellipse cx="70" cy="212" rx="17" ry="6.5" fill="url(#beardGlow)" transform="rotate(24 70 212)"/>
+      </g>
+
+      <g class="petal fall" style="--rd:8deg" filter="url(#petalTexture)">
+        <path d="M158 258 C194 250 228 258 258 236 C280 220 290 192 286 160 C262 168 242 186 228 210 C212 236 188 250 158 258 Z" fill="url(#fallDeep)"/>
+        <path d="M260 232 C256 210 248 190 232 174" stroke="#200c38" stroke-width="1" fill="none" opacity=".45"/>
+        <path d="M250 224 C246 204 238 186 224 170" stroke="#200c38" stroke-width="1" fill="none" opacity=".35"/>
+        <ellipse cx="250" cy="212" rx="17" ry="6.5" fill="url(#beardGlow)" transform="rotate(-24 250 212)"/>
+      </g>
+
+      <g class="petal fall" style="--rd:0deg" filter="url(#petalTexture)">
+        <path d="M160 262 C144 232 138 196 144 160 C148 138 156 120 160 108 C164 120 172 138 176 160 C182 196 176 232 160 262 Z" fill="url(#fallMid)"/>
+        <path d="M152 234 C148 200 150 168 160 138" stroke="#2c1148" stroke-width="1.1" fill="none" opacity=".4"/>
+        <path d="M168 234 C172 200 170 168 160 138" stroke="#2c1148" stroke-width="1.1" fill="none" opacity=".4"/>
+        <ellipse cx="160" cy="196" rx="9" ry="20" fill="url(#beardGlow)" opacity=".9"/>
+      </g>
+
+      <!-- STANDARDS: los 3 petalos superiores, mas erguidos y ondulados -->
+      <g class="petal petal-back" style="--rb:-14deg" filter="url(#petalTexture)">
+        <path d="M160 210 C130 196 110 164 108 122 C106 92 118 66 138 48 C142 78 140 108 148 136 C154 158 158 184 160 210 Z" fill="url(#standardGrad)"/>
+        <path d="M132 176 C122 148 118 116 128 84" stroke="#4a2166" stroke-width="1" fill="none" opacity=".4"/>
+      </g>
+
+      <g class="petal petal-back" style="--rb:14deg" filter="url(#petalTexture)">
+        <path d="M160 210 C190 196 210 164 212 122 C214 92 202 66 182 48 C178 78 180 108 172 136 C166 158 162 184 160 210 Z" fill="url(#standardGrad)"/>
+        <path d="M188 176 C198 148 202 116 192 84" stroke="#4a2166" stroke-width="1" fill="none" opacity=".4"/>
+      </g>
+
+      <g class="petal petal-front" style="--rf:0deg" filter="url(#petalTexture)">
+        <path d="M160 214 C138 190 128 152 132 112 C135 78 148 48 160 26 C172 48 185 78 188 112 C192 152 182 190 160 214 Z" fill="url(#standardFront)"/>
+        <path d="M160 200 C150 170 146 138 150 104 C152 82 156 60 160 44" stroke="#7d4aa3" stroke-width="1.1" fill="none" opacity=".5"/>
+        <path d="M160 200 C170 170 174 138 170 104 C168 82 164 60 160 44" stroke="#7d4aa3" stroke-width="1.1" fill="none" opacity=".5"/>
+        <path d="M144 150 C150 140 170 140 176 150" stroke="#f0dcfa" stroke-width="1.4" fill="none" opacity=".55" filter="url(#soft)"/>
+        <path d="M148 100 C153 92 167 92 172 100" stroke="#f0dcfa" stroke-width="1.2" fill="none" opacity=".45" filter="url(#soft)"/>
+      </g>
+
+      <!-- destellos -->
+      <g class="sparkle" transform="translate(78,150)">
+        <path d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z" fill="#f4e3ff"/>
+      </g>
+      <g class="sparkle" transform="translate(240,168)">
+        <path d="M0 -6 L1.5 -1.5 L6 0 L1.5 1.5 L0 6 L-1.5 1.5 L-6 0 L-1.5 -1.5 Z" fill="#f4e3ff"/>
+      </g>
+      <g class="sparkle" transform="translate(160,40)">
+        <path d="M0 -7 L1.7 -1.7 L7 0 L1.7 1.7 L0 7 L-1.7 1.7 L-7 0 L-1.7 -1.7 Z" fill="#fff4d6"/>
+      </g>
+    </svg>
+    <p class="hint" id="hintText">toca el lirio</p>
+  </div>
+
+  <div class="dedication" id="dedication">
+    <p>Marjorie, hay flores que se cultivan y flores que simplemente aparecen para quedarse. Tú fuiste de las segundas.</p>
+    <p>El lirio morado nace de raíces firmes y abre despacio, como las cosas que valen de verdad. Así ha sido cada momento contigo: paciente, honesto, y más bonito de lo que esperaba.</p>
+    <p>Que esta pequeña flor te recuerde, cada vez que la mires, cuánto significas.</p>
+    <span class="signature">Con todo mi cariño.</span>
+  </div>
+</div>
+
+<footer>hecho con cariño para Marjorie</footer>
+
+<script>
+  const wrap = document.getElementById('flowerWrap');
+  const ded = document.getElementById('dedication');
+  const hint = document.getElementById('hintText');
+  const fallLayer = document.getElementById('petalsFall');
+  let opened = false;
+
+  function spawnPetals(n){
+    for(let i=0;i<n;i++){
+      const p = document.createElement('div');
+      p.className = 'fp';
+      p.style.left = (Math.random()*100) + 'vw';
+      const dur = 4 + Math.random()*3;
+      p.style.animationDuration = dur + 's';
+      p.style.animationDelay = (Math.random()*1.2) + 's';
+      p.style.width = (10 + Math.random()*8) + 'px';
+      p.style.height = (14 + Math.random()*10) + 'px';
+      fallLayer.appendChild(p);
+      setTimeout(()=>p.remove(), (dur+1.5)*1000);
+    }
+  }
+
+  function toggleBloom(){
+    opened = !opened;
+    wrap.classList.toggle('bloom', opened);
+    ded.classList.toggle('open', opened);
+    hint.textContent = opened ? 'toca para cerrar' : 'toca el lirio';
+    if(opened){ spawnPetals(18); }
+  }
+
+  wrap.addEventListener('click', toggleBloom);
+  wrap.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleBloom(); }
+  });
+</script>
+</body>
+</html>
